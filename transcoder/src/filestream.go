@@ -252,7 +252,7 @@ func (fs *FileStream) getAudioStream(idx uint32, quality AudioQuality) (*AudioSt
 func (fs *FileStream) GetAudioIndex(idx uint32, quality AudioQuality, client string) (string, error) {
 	stream, err := fs.getAudioStream(idx, quality)
 	if err != nil {
-		return "", nil
+		return "", err
 	}
 	return stream.GetIndex(client)
 }
@@ -260,7 +260,7 @@ func (fs *FileStream) GetAudioIndex(idx uint32, quality AudioQuality, client str
 func (fs *FileStream) GetAudioSegment(idx uint32, quality AudioQuality, segment int32) (string, error) {
 	stream, err := fs.getAudioStream(idx, quality)
 	if err != nil {
-		return "", nil
+		return "", err
 	}
 	return stream.GetSegment(segment)
 }
