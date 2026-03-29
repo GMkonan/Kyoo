@@ -5,9 +5,11 @@ import {
 	entries,
 	entryVideoJoin,
 	profiles,
+	roles,
 	showStudioJoin,
 	shows,
 	showTranslations,
+	staff,
 	studios,
 	studioTranslations,
 	videos,
@@ -92,6 +94,24 @@ export const showFilters: FilterDef = {
 		type: "int",
 	},
 	nextRefresh: { column: shows.nextRefresh, type: "date" },
+	studios: {
+		column: db
+			.select({ slug: studios.slug })
+			.from(showStudioJoin)
+			.innerJoin(studios, eq(studios.pk, showStudioJoin.studioPk))
+			.where(eq(showStudioJoin.showPk, shows.pk)),
+		type: "string",
+		isArray: true,
+	},
+	staff: {
+		column: db
+			.select({ slug: staff.slug })
+			.from(roles)
+			.innerJoin(staff, eq(staff.pk, roles.staffPk))
+			.where(eq(roles.showPk, shows.pk)),
+		type: "string",
+		isArray: true,
+	},
 };
 export const showSort = Sort(
 	{
