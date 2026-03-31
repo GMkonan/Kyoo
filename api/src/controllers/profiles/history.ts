@@ -76,7 +76,7 @@ async function updateHistory(
 				.select({ videoId: videos.id })
 				.from(history)
 				.for("update", { of: sql`history` as any })
-				.leftJoin(videos, eq(videos.pk, history.videoPk))
+				.innerJoin(videos, eq(videos.pk, history.videoPk))
 				.where(
 					and(
 						eq(history.profilePk, userPk),
@@ -86,12 +86,16 @@ async function updateHistory(
 		).map((x) => x.videoId);
 
 		const toUpdate = traverse(
-			progress.filter((x) => existing.includes(x.videoId)),
+			progress.filter((x) => x.videoId && existing.includes(x.videoId)),
 		);
 		const newEntries = traverse(
 			progress
-				.filter((x) => !existing.includes(x.videoId))
-				.map((x) => ({ ...x, entryUseid: isUuid(x.entry) })),
+				.filter((x) => !x.videoId || !existing.includes(x.videoId))
+				.map((x) => ({
+					...x,
+					external: x.external ?? false,
+					entryUseid: isUuid(x.entry),
+				})),
 		);
 
 		const updated =
@@ -140,6 +144,7 @@ async function updateHistory(
 									playedDate: coalesce(sql`hist.played_date`, sql`now()`).as(
 										"playedDate",
 									),
+									external: sql`hist.external`.as("external"),
 								})
 								.from(sql`unnest(
 									${sqlarr(newEntries.entry)}::text[],
@@ -147,8 +152,9 @@ async function updateHistory(
 									${sqlarr(newEntries.videoId)}::uuid[],
 									${sqlarr(newEntries.time)}::integer[],
 									${sqlarr(newEntries.percent)}::integer[],
-									${sqlarr(newEntries.playedDate)}::timestamptz[]
-								) as hist(entry, entry_use_id, video_id, ts, percent, played_date)`)
+									${sqlarr(newEntries.playedDate)}::timestamptz[],
+									${sqlarr(newEntries.external)}::boolean[]
+								) as hist(entry, entry_use_id, video_id, ts, percent, played_date, external)`)
 								.innerJoin(
 									entries,
 									sql`
@@ -244,7 +250,7 @@ async function updateWatchlist(
 					seenCount: sql`
 						case
 							when ${entries.kind} = 'movie' then hist.percent
-							when hist.percent >= 95 then 1
+							when hist.percent >= 95 then 100
 							else 0
 						end
 					`.as("seen_count"),
@@ -315,6 +321,7 @@ const historyProgressQ: typeof entryProgressQ = db
 		entryPk: history.entryPk,
 		playedDate: history.playedDate,
 		videoId: videos.id,
+		external: history.external,
 	})
 	.from(history)
 	.leftJoin(videos, eq(history.videoPk, videos.pk))
@@ -360,6 +367,7 @@ export const historyH = new Elysia({ tags: ["profiles"] })
 							sort,
 							filter: and(
 								isNotNull(entryProgressQ.playedDate),
+								eq(entryProgressQ.external, false),
 								ne(entries.kind, "extra"),
 								filter,
 							),
@@ -406,6 +414,7 @@ export const historyH = new Elysia({ tags: ["profiles"] })
 							sort,
 							filter: and(
 								isNotNull(entryProgressQ.playedDate),
+								eq(entryProgressQ.external, false),
 								ne(entries.kind, "extra"),
 								filter,
 							),

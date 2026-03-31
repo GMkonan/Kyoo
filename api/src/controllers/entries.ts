@@ -62,6 +62,7 @@ export const entryProgressQ = db
 		entryPk: history.entryPk,
 		playedDate: history.playedDate,
 		videoId: videos.id,
+		external: history.external,
 	})
 	.from(history)
 	.leftJoin(videos, eq(history.videoPk, videos.pk))
