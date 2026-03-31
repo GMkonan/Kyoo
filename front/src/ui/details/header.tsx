@@ -401,7 +401,9 @@ const Description = ({
 							<UL className="flex-1 flex-wrap max-sm:flex-row max-sm:items-center max-sm:text-center">
 								{genres.map((genre) => (
 									<LI key={genre}>
-										<A href={`/genres/${genre.toLowerCase()}`}>
+										<A
+											href={`/browse?filter=genres has ${genre.toLowerCase()}`}
+										>
 											{t(`genres.${genre}`)}
 										</A>
 									</LI>
@@ -435,7 +437,7 @@ const Description = ({
 					{studios.map((x, i) => (
 						<Fragment key={x.id}>
 							{i !== 0 && ","}
-							<A href={x.slug} className="ml-2">
+							<A href={`/browse?filter=studios has ${x.slug}`} className="ml-2">
 								{x.name}
 							</A>
 						</Fragment>
