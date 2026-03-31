@@ -3,30 +3,18 @@ import Register from "@material-symbols/svg-400/rounded/app_registration.svg";
 import Close from "@material-symbols/svg-400/rounded/close.svg";
 import Login from "@material-symbols/svg-400/rounded/login.svg";
 import Logout from "@material-symbols/svg-400/rounded/logout.svg";
-import Person from "@material-symbols/svg-400/rounded/person-fill.svg";
 import Search from "@material-symbols/svg-400/rounded/search-fill.svg";
 import Settings from "@material-symbols/svg-400/rounded/settings.svg";
 import { useIsFocused } from "@react-navigation/native";
-import {
-	useGlobalSearchParams,
-	useLocalSearchParams,
-	useNavigation,
-	usePathname,
-	useRouter,
-} from "expo-router";
+import { useNavigation, usePathname, useRouter } from "expo-router";
 import KyooLongLogo from "public/icon-long.svg";
-import {
-	type ComponentProps,
-	useEffect,
-	useLayoutEffect,
-	useRef,
-	useState,
-} from "react";
+import { type ComponentProps, useLayoutEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
 	Platform,
 	type PressableProps,
 	TextInput,
+	type TextInputProps,
 	View,
 	type ViewProps,
 } from "react-native";
@@ -44,7 +32,6 @@ import {
 	HR,
 	HRP,
 	IconButton,
-	Link,
 	Menu,
 	PressableFeedback,
 	tooltip,
@@ -105,17 +92,18 @@ export const NavbarRight = () => {
 		<View className="shrink flex-row items-center">
 			<SearchBar
 				key={path}
-				query={path === "/browse" ? q : undefined}
-				onChange={(query) => {
-					if (path === "/browse") setQuery(query);
+				value={path === "/browse" ? q : undefined}
+				onChangeText={(query) => {
+					console.log(query);
+					if (path === "/browse") {
+						setQuery(query ?? undefined);
+					}
 				}}
-				onSubmit={(query) => {
+				onSubmitEditing={(e) => {
+					const query = e.nativeEvent.text;
 					if (query && path !== "/browse") {
 						router.push(`/browse?q=${query}`);
 					}
-				}}
-				onClear={() => {
-					if (path === "/browse") setQuery(undefined);
 				}}
 			/>
 			<NavbarProfile />
@@ -123,26 +111,29 @@ export const NavbarRight = () => {
 	);
 };
 
-const SearchBar = ({
-	query,
-	onChange,
-	onSubmit,
-	onClear,
-}: {
-	query: string | undefined;
-	onChange: (query: string) => void;
-	onSubmit?: (query: string | undefined) => void;
-	onClear?: () => void;
-}) => {
+export const SearchBar = ({
+	value,
+	onChangeText,
+	onSubmitEditing,
+	onBlur,
+	onFocus,
+	className,
+	containerClassName,
+	forceExpand,
+	...props
+}: TextInputProps & { forceExpand?: boolean; containerClassName?: string }) => {
 	const { t } = useTranslation();
-	const [expanded, setExpanded] = useState(!!query);
+	const [_expanded, setExpanded] = useState(!!value);
 	const inputRef = useRef<TextInput>(null);
+
+	const expanded = _expanded || forceExpand;
 
 	return (
 		<Animated.View
 			className={cn(
-				"mr-2 flex-row items-center overflow-hidden p-0 pl-4",
+				"mr-2 flex-1 flex-row items-center overflow-hidden p-0 pl-4",
 				"rounded-full bg-slate-100 dark:bg-slate-800",
+				containerClassName,
 			)}
 			style={[
 				expanded ? { flex: 1 } : { backgroundColor: "transparent" },
@@ -154,12 +145,16 @@ const SearchBar = ({
 		>
 			<TextInput
 				ref={inputRef}
-				value={query}
-				onChangeText={(q) => onChange(q)}
-				onSubmitEditing={(e) => onSubmit?.(e.nativeEvent.text)}
-				onFocus={() => setExpanded(true)}
-				onBlur={() => {
-					if (!query) setExpanded(false);
+				value={value}
+				onChangeText={(q) => onChangeText?.(q)}
+				onSubmitEditing={(e) => onSubmitEditing?.(e)}
+				onFocus={(e) => {
+					onFocus?.(e);
+					setExpanded(true);
+				}}
+				onBlur={(e) => {
+					onBlur?.(e);
+					if (!value) setExpanded(false);
 				}}
 				placeholder={t("navbar.search")}
 				textAlignVertical="center"
@@ -167,8 +162,10 @@ const SearchBar = ({
 					"h-full flex-1 font-sans text-base outline-0",
 					"align-middle text-slate-600 dark:text-slate-200",
 					!expanded && "w-0 grow-0",
+					className,
 				)}
 				placeholderTextColorClassName="accent-slate-400 dark:text-slate-600"
+				{...props}
 			/>
 
 			<IconButton
@@ -177,10 +174,12 @@ const SearchBar = ({
 				//  https://github.com/react-navigation/react-navigation/issues/12274
 				//  https://github.com/react-navigation/react-navigation/issues/12667
 				onPressIn={() => {
+					console.log(expanded);
 					if (expanded) {
 						inputRef.current?.blur();
+						inputRef.current?.clear();
+						onChangeText?.("");
 						setExpanded(false);
-						onClear?.();
 					} else {
 						setExpanded(true);
 						// Small delay to allow animation to start before focusing

@@ -8,6 +8,7 @@ import { EntrySelect } from "~/components/entries/select";
 import type { Entry, Serie } from "~/models";
 import { Container, H2, Svg, usePopup } from "~/primitives";
 import { Fetch } from "~/query";
+import { SearchBar } from "~/ui/navbar";
 import { useQueryState } from "~/utils";
 import { HeaderBackground, useScrollNavbar } from "../navbar";
 import { Header } from "./header";
@@ -88,6 +89,8 @@ const SerieHeader = ({
 		videos: Entry["videos"];
 	}) => void;
 }) => {
+	const [_, setSearch] = useQueryState("search", "");
+
 	return (
 		<View className="bg-background">
 			<Header kind="serie" slug={slug} onImageLayout={onImageLayout} />
@@ -104,6 +107,15 @@ const SerieHeader = ({
 			/>
 			<Staff kind="serie" slug={slug} />
 			<SvgWave className="flex-1 shrink-0 fill-card" />
+			<View className="bg-card pb-4 pl-[10%]">
+				<View className="-mt-4 lg:-mt-12 xl:-mt-24">
+					<SearchBar
+						onChangeText={(q) => setSearch(q)}
+						forceExpand
+						containerClassName="w-2/5 max-w-90"
+					/>
+				</View>
+			</View>
 		</View>
 	);
 };
@@ -111,6 +123,7 @@ const SerieHeader = ({
 export const SerieDetails = () => {
 	const [slug] = useQueryState("slug", undefined!);
 	const [season] = useQueryState("season", undefined!);
+	const [search] = useQueryState("search", "");
 	const insets = useSafeAreaInsets();
 	const [imageHeight, setHeight] = useState(300);
 	const { scrollHandler, headerProps, headerHeight } = useScrollNavbar({
@@ -142,6 +155,7 @@ export const SerieDetails = () => {
 			<EntryList
 				slug={slug}
 				season={season}
+				search={search}
 				onSelectVideos={openEntrySelect}
 				Header={() => (
 					<SerieHeader

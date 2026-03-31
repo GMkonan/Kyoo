@@ -95,6 +95,7 @@ export const EntryList = ({
 	slug,
 	season,
 	onSelectVideos,
+	search,
 	...props
 }: {
 	slug: string;
@@ -104,6 +105,7 @@ export const EntryList = ({
 		name: string | null;
 		videos: Entry["videos"];
 	}) => void;
+	search?: string;
 } & Partial<ComponentProps<typeof InfiniteFetch<EntryOrSeason>>>) => {
 	const { t } = useTranslation();
 	const { items: seasons, error } = useInfiniteFetch(SeasonHeader.query(slug));
@@ -112,7 +114,7 @@ export const EntryList = ({
 
 	return (
 		<InfiniteFetch
-			query={EntryList.query(slug, season)}
+			query={EntryList.query(slug, season, search)}
 			layout={EntryLine.layout}
 			Empty={<EmptyView message={t("show.episode-none")} />}
 			Divider={() => (
@@ -176,10 +178,12 @@ type EntryOrSeason = z.infer<typeof EntryOrSeason>;
 EntryList.query = (
 	slug: string,
 	season: string | number,
+	query: string | undefined,
 ): QueryIdentifier<EntryOrSeason> => ({
 	parser: EntryOrSeason,
 	path: ["api", "series", slug, "entries"],
 	params: {
+		query,
 		// TODO: use a better filter, it removes specials and movies
 		filter: season ? `seasonNumber ge ${season}` : undefined,
 		includeSeasons: true,
