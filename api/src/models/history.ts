@@ -33,6 +33,18 @@ export const SeedHistory = t.Intersect([
 		entry: t.String({
 			description: "Id or slug of the entry/movie you watched",
 		}),
+		external: t.Optional(
+			t.Boolean({
+				description: comment`
+					Set this to true if the user marked the entry as watched
+					without actually watching it on kyoo.
+
+					If true, it will not add it to the history but still mark it as
+					seen.
+				`,
+				default: false,
+			}),
+		),
 	}),
 ]);
 export type SeedHistory = typeof SeedHistory.static;

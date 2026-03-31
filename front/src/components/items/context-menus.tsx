@@ -29,7 +29,24 @@ export const EntryContext = ({
 } & Partial<ComponentProps<typeof Menu>> &
 	Partial<ComponentProps<typeof IconButton>>) => {
 	// const downloader = useDownloader();
+	const account = useAccount();
 	const { t } = useTranslation();
+
+	const markAsSeenMutation = useMutation({
+		method: "POST",
+		path: ["api", "profiles", "me", "history"],
+		body: [
+			{
+				percent: 100,
+				entry: slug,
+				videoId: null,
+				time: 0,
+				playedDate: null,
+				external: true,
+			},
+		],
+		invalidate: null,
+	});
 
 	return (
 		<Menu
@@ -39,6 +56,13 @@ export const EntryContext = ({
 			{...tooltip(t("misc.more"))}
 			{...(props as any)}
 		>
+			{account && (
+				<Menu.Item
+					label={t("show.watchlistMark.completed")}
+					icon={watchListIcon("completed")}
+					onSelect={() => markAsSeenMutation.mutate()}
+				/>
+			)}
 			{serieSlug && (
 				<Menu.Item
 					label={t("home.episodeMore.goToShow")}

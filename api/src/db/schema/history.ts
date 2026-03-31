@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { check, index, integer, timestamp } from "drizzle-orm/pg-core";
+import { boolean, check, index, integer, timestamp } from "drizzle-orm/pg-core";
 import { entries } from "./entries";
 import { profiles } from "./profiles";
 import { schema } from "./utils";
@@ -23,6 +23,8 @@ export const history = schema.table(
 		playedDate: timestamp({ withTimezone: true, precision: 3 })
 			.notNull()
 			.defaultNow(),
+		// true if the user only marked the entry has seen and has not seen it on kyoo
+		external: boolean().notNull(),
 	},
 	(t) => [
 		index("history_play_date").on(t.playedDate.desc()),
