@@ -95,7 +95,8 @@
 			"desc": "decs"
 		},
 		"switchToGrid": "Switch to grid view",
-		"switchToList": "Switch to list view"
+		"switchToList": "Switch to list view",
+		"not": "Not"
 	},
 	"profile": {
 		"history": "History",

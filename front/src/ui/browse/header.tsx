@@ -1,7 +1,7 @@
 import ArrowDownward from "@material-symbols/svg-400/rounded/arrow_downward.svg";
 import ArrowUpward from "@material-symbols/svg-400/rounded/arrow_upward.svg";
 import Check from "@material-symbols/svg-400/rounded/check.svg";
-import Close from "@material-symbols/svg-400/rounded/close.svg";
+import CloseIcon from "@material-symbols/svg-400/rounded/close.svg";
 import Collection from "@material-symbols/svg-400/rounded/collections_bookmark.svg";
 import FilterList from "@material-symbols/svg-400/rounded/filter_list.svg";
 import GridView from "@material-symbols/svg-400/rounded/grid_view.svg";
@@ -106,6 +106,30 @@ const FilterTrigger = ({
 	);
 };
 
+const FilterChip = ({
+	label,
+	onRemove,
+}: {
+	label: string;
+	onRemove: () => void;
+}) => {
+	return (
+		<PressableFeedback
+			onPress={onRemove}
+			className={cn(
+				"flex-row items-center gap-1 rounded-4xl border border-accent px-2.5 py-1",
+				"bg-accent",
+			)}
+		>
+			<P className="text-slate-200 text-sm dark:text-slate-300">{label}</P>
+			<Icon
+				icon={CloseIcon}
+				className="h-4 w-4 fill-slate-200 dark:fill-slate-300"
+			/>
+		</PressableFeedback>
+	);
+};
+
 const parseFilterValues = (filter: string, pattern: RegExp) =>
 	Array.from(filter.matchAll(pattern)).map((x) => x[1]);
 
@@ -176,161 +200,223 @@ export const BrowseSettings = ({
 	};
 
 	return (
-		<View className="mx-8 my-2 flex-1 flex-row flex-wrap items-center justify-between">
-			<View className="flex-row gap-3">
-				<Menu
-					Trigger={MediaTypeTrigger}
-					mediaType={mediaType as keyof typeof MediaTypeIcons}
-				>
-					{Object.keys(MediaTypeIcons).map((x) => (
-						<Menu.Item
-							key={x}
-							label={t(
-								`browse.mediatypekey.${x as keyof typeof MediaTypeIcons}`,
-							)}
-							selected={mediaType === x}
-							icon={MediaTypeIcons[x as keyof typeof MediaTypeIcons]}
-							onSelect={() => applyFilters({ kind: x })}
-						/>
-					))}
-				</Menu>
-				<Menu
-					Trigger={(props: PressableProps) => (
-						<FilterTrigger
-							label={t("show.genre")}
-							count={includedGenres.length + excludedGenres.length}
-							icon={TheaterComedy}
-							{...props}
-						/>
-					)}
-				>
-					{Genre.options.map((genre) => {
-						const isIncluded = includedGenres.includes(genre);
-						const isExcluded = excludedGenres.includes(genre);
-						return (
+		<View>
+			<View className="mx-8 my-2 flex-1 flex-row flex-wrap items-center justify-between">
+				<View className="flex-row gap-3">
+					<Menu
+						Trigger={MediaTypeTrigger}
+						mediaType={mediaType as keyof typeof MediaTypeIcons}
+					>
+						{Object.keys(MediaTypeIcons).map((x) => (
 							<Menu.Item
-								key={genre}
-								label={t(`genres.${genre}`)}
-								left={
-									<View className="h-6 w-6 items-center justify-center">
-										{(isIncluded || isExcluded) && (
-											<Icon icon={isExcluded ? Close : Check} />
-										)}
-									</View>
-								}
-								closeOnSelect={false}
-								onSelect={() => {
-									let nextIncluded = includedGenres;
-									let nextExcluded = excludedGenres;
-									if (isIncluded) {
-										// include -> exclude
-										nextIncluded = nextIncluded.filter((g) => g !== genre);
-										nextExcluded = [...nextExcluded, genre];
-									} else if (isExcluded) {
-										// exclude -> neutral
-										nextExcluded = nextExcluded.filter((g) => g !== genre);
-									} else {
-										// neutral -> include
-										nextIncluded = [...nextIncluded, genre];
-									}
-									applyFilters({
-										nextIncludedGenres: nextIncluded,
-										nextExcludedGenres: nextExcluded,
-									});
-								}}
+								key={x}
+								label={t(
+									`browse.mediatypekey.${x as keyof typeof MediaTypeIcons}`,
+								)}
+								selected={mediaType === x}
+								icon={MediaTypeIcons[x as keyof typeof MediaTypeIcons]}
+								onSelect={() => applyFilters({ kind: x })}
 							/>
-						);
-					})}
-				</Menu>
-				<ComboBox
-					multiple
-					label={t("show.studios")}
-					searchPlaceholder={t("navbar.search")}
-					Trigger={(props) => (
-						<FilterTrigger
-							label={t("show.studios")}
-							count={studioSlugs.length}
-							icon={TV}
-							{...props}
-						/>
-					)}
-					query={(search) => ({
-						path: ["api", "studios"],
-						parser: Studio,
-						infinite: true,
-						params: {
-							query: search,
-						},
-					})}
-					values={studioSlugs.map((x) => ({ slug: x, name: x }))}
-					getKey={(studio) => studio.slug}
-					getLabel={(studio) => studio.name}
-					onValueChange={(items) =>
-						applyFilters({ nextStudios: items.map((item) => item.slug) })
-					}
-				/>
-				<ComboBox
-					multiple
-					label={t("show.staff")}
-					searchPlaceholder={t("navbar.search")}
-					Trigger={(props) => (
-						<FilterTrigger
-							label={t("show.staff")}
-							count={staffSlugs.length}
-							icon={Person}
-							{...props}
-						/>
-					)}
-					query={(search) => ({
-						path: ["api", "staff"],
-						parser: Staff,
-						infinite: true,
-						params: {
-							query: search,
-						},
-					})}
-					values={staffSlugs.map((x) => ({ slug: x, name: x }))}
-					getKey={(member) => member.slug}
-					getLabel={(member) => member.name}
-					onValueChange={(items) =>
-						applyFilters({ nextStaff: items.map((item) => item.slug) })
-					}
-				/>
+						))}
+					</Menu>
+					<Menu
+						Trigger={(props: PressableProps) => (
+							<FilterTrigger
+								label={t("show.genre")}
+								count={includedGenres.length + excludedGenres.length}
+								icon={TheaterComedy}
+								{...props}
+							/>
+						)}
+					>
+						{Genre.options.map((genre) => {
+							const isIncluded = includedGenres.includes(genre);
+							const isExcluded = excludedGenres.includes(genre);
+							return (
+								<Menu.Item
+									key={genre}
+									label={t(`genres.${genre}`)}
+									left={
+										<View className="h-6 w-6 items-center justify-center">
+											{(isIncluded || isExcluded) && (
+												<Icon icon={isExcluded ? CloseIcon : Check} />
+											)}
+										</View>
+									}
+									closeOnSelect={false}
+									onSelect={() => {
+										let nextIncluded = includedGenres;
+										let nextExcluded = excludedGenres;
+										if (isIncluded) {
+											// include -> exclude
+											nextIncluded = nextIncluded.filter((g) => g !== genre);
+											nextExcluded = [...nextExcluded, genre];
+										} else if (isExcluded) {
+											// exclude -> neutral
+											nextExcluded = nextExcluded.filter((g) => g !== genre);
+										} else {
+											// neutral -> include
+											nextIncluded = [...nextIncluded, genre];
+										}
+										applyFilters({
+											nextIncludedGenres: nextIncluded,
+											nextExcludedGenres: nextExcluded,
+										});
+									}}
+								/>
+							);
+						})}
+					</Menu>
+					<ComboBox
+						multiple
+						label={t("show.studios")}
+						searchPlaceholder={t("navbar.search")}
+						Trigger={(props) => (
+							<FilterTrigger
+								label={t("show.studios")}
+								count={studioSlugs.length}
+								icon={TV}
+								{...props}
+							/>
+						)}
+						query={(search) => ({
+							path: ["api", "studios"],
+							parser: Studio,
+							infinite: true,
+							params: {
+								query: search,
+							},
+						})}
+						values={studioSlugs.map((x) => ({ slug: x, name: x }))}
+						getKey={(studio) => studio.slug}
+						getLabel={(studio) => studio.name}
+						onValueChange={(items) =>
+							applyFilters({ nextStudios: items.map((item) => item.slug) })
+						}
+					/>
+					<ComboBox
+						multiple
+						label={t("show.staff")}
+						searchPlaceholder={t("navbar.search")}
+						Trigger={(props) => (
+							<FilterTrigger
+								label={t("show.staff")}
+								count={staffSlugs.length}
+								icon={Person}
+								{...props}
+							/>
+						)}
+						query={(search) => ({
+							path: ["api", "staff"],
+							parser: Staff,
+							infinite: true,
+							params: {
+								query: search,
+							},
+						})}
+						values={staffSlugs.map((x) => ({ slug: x, name: x }))}
+						getKey={(member) => member.slug}
+						getLabel={(member) => member.name}
+						onValueChange={(items) =>
+							applyFilters({ nextStaff: items.map((item) => item.slug) })
+						}
+					/>
+				</View>
+				<View className="flex-row">
+					<Menu Trigger={SortTrigger} sortBy={sortBy}>
+						{availableSorts.map((x) => (
+							<Menu.Item
+								key={x}
+								label={t(`browse.sortkey.${x}`)}
+								selected={sortBy === x}
+								icon={sortOrd === "asc" ? ArrowUpward : ArrowDownward}
+								onSelect={() =>
+									setSort(x, sortBy === x && sortOrd === "asc" ? "desc" : "asc")
+								}
+							/>
+						))}
+					</Menu>
+					<HR orientation="vertical" />
+					<IconButton
+						icon={GridView}
+						onPress={() => setLayout("grid")}
+						className="m-1"
+						iconClassName={cn(
+							layout === "grid" && "fill-accent dark:fill-accent",
+						)}
+						{...tooltip(t("browse.switchToGrid"))}
+					/>
+					<IconButton
+						icon={ViewList}
+						onPress={() => setLayout("list")}
+						className="m-1"
+						iconClassName={cn(
+							layout === "list" && "fill-accent dark:fill-accent",
+						)}
+						{...tooltip(t("browse.switchToList"))}
+					/>
+				</View>
 			</View>
-			<View className="flex-row">
-				<Menu Trigger={SortTrigger} sortBy={sortBy}>
-					{availableSorts.map((x) => (
-						<Menu.Item
-							key={x}
-							label={t(`browse.sortkey.${x}`)}
-							selected={sortBy === x}
-							icon={sortOrd === "asc" ? ArrowUpward : ArrowDownward}
-							onSelect={() =>
-								setSort(x, sortBy === x && sortOrd === "asc" ? "desc" : "asc")
+			{(mediaType !== "all" ||
+				includedGenres.length > 0 ||
+				excludedGenres.length > 0 ||
+				studioSlugs.length > 0 ||
+				staffSlugs.length > 0) && (
+				<View className="mx-8 mb-2 flex-row flex-wrap gap-2">
+					{mediaType !== "all" && (
+						<FilterChip
+							label={t(
+								`browse.mediatypekey.${mediaType as keyof typeof MediaTypeIcons}`,
+							)}
+							onRemove={() => applyFilters({ kind: "all" })}
+						/>
+					)}
+					{includedGenres.map((genre) => (
+						<FilterChip
+							key={`genre-inc-${genre}`}
+							label={t(`genres.${genre as Genre}`)}
+							onRemove={() =>
+								applyFilters({
+									nextIncludedGenres: includedGenres.filter((g) => g !== genre),
+								})
 							}
 						/>
 					))}
-				</Menu>
-				<HR orientation="vertical" />
-				<IconButton
-					icon={GridView}
-					onPress={() => setLayout("grid")}
-					className="m-1"
-					iconClassName={cn(
-						layout === "grid" && "fill-accent dark:fill-accent",
-					)}
-					{...tooltip(t("browse.switchToGrid"))}
-				/>
-				<IconButton
-					icon={ViewList}
-					onPress={() => setLayout("list")}
-					className="m-1"
-					iconClassName={cn(
-						layout === "list" && "fill-accent dark:fill-accent",
-					)}
-					{...tooltip(t("browse.switchToList"))}
-				/>
-			</View>
+					{excludedGenres.map((genre) => (
+						<FilterChip
+							key={`genre-exc-${genre}`}
+							label={`${t("browse.not")} ${t(`genres.${genre as Genre}`)}`}
+							onRemove={() =>
+								applyFilters({
+									nextExcludedGenres: excludedGenres.filter((g) => g !== genre),
+								})
+							}
+						/>
+					))}
+					{studioSlugs.map((studio) => (
+						<FilterChip
+							key={`studio-${studio}`}
+							label={studio}
+							onRemove={() =>
+								applyFilters({
+									nextStudios: studioSlugs.filter((s) => s !== studio),
+								})
+							}
+						/>
+					))}
+					{staffSlugs.map((staff) => (
+						<FilterChip
+							key={`staff-${staff}`}
+							label={staff}
+							onRemove={() =>
+								applyFilters({
+									nextStaff: staffSlugs.filter((s) => s !== staff),
+								})
+							}
+						/>
+					))}
+				</View>
+			)}
 		</View>
 	);
 };
