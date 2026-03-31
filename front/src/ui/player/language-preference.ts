@@ -15,13 +15,14 @@ export const useLanguagePreference = (player: VideoPlayer, slug: string) => {
 		lang: account?.claims.settings.audioLanguage ?? null,
 	});
 	useEvent(player, "onAudioTrackChange", () => {
+		if (!audios?.length) return;
 		const selected =
 			audios?.[player.getAvailableTextTracks().findIndex((x) => x.selected)];
 		if (!selected) return;
 		aud.current = { idx: selected.index, lang: selected.language };
 	});
 	useEffect(() => {
-		if (!audios) return;
+		if (!audios?.length) return;
 		let audRet = audios.findIndex(
 			aud.current.lang === "default"
 				? (x) => x.isDefault
@@ -47,7 +48,7 @@ export const useLanguagePreference = (player: VideoPlayer, slug: string) => {
 			sub.current = { idx: null, lang: null, forced: false };
 			return;
 		}
-		if (!subtitles) return;
+		if (!subtitles?.length) return;
 		const idx = player.getAvailableTextTracks().findIndex((x) => x.selected);
 		sub.current = {
 			idx: idx,
@@ -56,7 +57,7 @@ export const useLanguagePreference = (player: VideoPlayer, slug: string) => {
 		};
 	});
 	useEffect(() => {
-		if (!subtitles || sub.current.idx === null) return;
+		if (!subtitles?.length || sub.current.idx === null) return;
 		let subRet = subtitles.findIndex(
 			sub.current.lang === "default"
 				? (x) => x.isDefault
