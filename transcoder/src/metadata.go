@@ -318,7 +318,7 @@ func (s *MetadataService) storeFreshMetadata(ctx context.Context, path string, s
 		tx.Exec(
 			ctx,
 			`
-			insert into gocoder.audios(sha, idx, title, language, codec, mime_codec, is_default, bitrate)
+			insert into gocoder.audios(sha, idx, title, language, codec, mime_codec, channels, is_default, bitrate)
 			values ($1, $2, $3, $4, $5, $6, $7, $8, $9)
 			on conflict (sha, idx) do update set
 				sha = excluded.sha,
