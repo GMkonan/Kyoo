@@ -11,7 +11,7 @@ from langcodes.data_dicts import LANGUAGE_REPLACEMENTS
 
 from ..cache import cache
 from ..models.collection import Collection, CollectionTranslation
-from ..models.entry import Entry, EntryTranslation
+from ..models.entry import Entry, EntryContent, EntryTranslation
 from ..models.genre import Genre
 from ..models.metadataid import EpisodeId, MetadataId, SeasonId
 from ..models.movie import Movie, MovieStatus, MovieTranslation, SearchMovie
@@ -541,8 +541,12 @@ class TVDB(Provider):
 				thumbnail=f"https://artworks.thetvdb.com{entry['image']}"
 				if entry["image"]
 				else None,
-				# Mark specials as non-critical, waiting for https://github.com/thetvdb/v4-api/issues/350
-				criticalToStory=entry["seasonNumber"] != 0 or entry["isMovie"],
+				# Mark specials as ova, waiting for https://github.com/thetvdb/v4-api/issues/350
+				content=(
+					EntryContent.STORY
+					if entry["seasonNumber"] != 0 or entry["isMovie"]
+					else EntryContent.OVA
+				),
 				slug=None,
 				season_number=entry["seasonNumber"],
 				episode_number=entry["number"],

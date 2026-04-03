@@ -1,6 +1,5 @@
 import { relations, sql } from "drizzle-orm";
 import {
-    boolean,
 	check,
 	date,
 	index,
@@ -23,6 +22,13 @@ export const entryType = schema.enum("entry_type", [
 	"movie",
 	"special",
 	"extra",
+]);
+
+export const entryContent = schema.enum("entry_content", [
+	"story",
+	"recap",
+	"filler",
+	"ova",
 ]);
 
 export const entry_extid = () =>
@@ -69,7 +75,7 @@ export const entries = schema.table(
 		airDate: date(),
 		runtime: integer(),
 		thumbnail: image(),
-		criticalToStory: boolean().notNull(),
+		content: entryContent().notNull(),
 
 		externalId: entry_extid(),
 

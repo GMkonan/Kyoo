@@ -277,7 +277,7 @@ function getNextVideoEntry({
 						eq(vids.part, sql`${videos.part} ${sql.raw(prev ? "-" : "+")} 1`),
 					),
 				),
-				entries.criticalToStory,
+				eq(entries.content, "story"),
 			),
 		)
 		.orderBy(

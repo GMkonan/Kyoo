@@ -1,6 +1,13 @@
 import { t } from "elysia";
 import { Image } from "../utils/image";
 
+export const EntryContent = t.Union([
+	t.Literal("story"),
+	t.Literal("recap"),
+	t.Literal("filler"),
+	t.Literal("ova"),
+]);
+
 export const BaseEntry = () =>
 	t.Object({
 		airDate: t.Nullable(t.String({ format: "date" })),
@@ -11,7 +18,7 @@ export const BaseEntry = () =>
 			}),
 		),
 		thumbnail: t.Nullable(Image),
-		criticalToStory: t.Boolean(),
+		content: EntryContent,
 	});
 
 export const EntryTranslation = () =>

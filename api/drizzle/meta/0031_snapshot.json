@@ -1,5 +1,5 @@
 {
-	"id": "bb9072e3-4c3a-44a0-8dae-f21259a5172b",
+	"id": "13b1ed8d-f166-4d39-ba67-39e8c4cfd786",
 	"prevId": "34fcf5bf-c0a7-4730-a705-0e7fe759d126",
 	"version": "7",
 	"dialect": "postgresql",
@@ -93,9 +93,10 @@
 					"primaryKey": false,
 					"notNull": false
 				},
-				"critical_to_story": {
-					"name": "critical_to_story",
-					"type": "boolean",
+				"content": {
+					"name": "content",
+					"type": "entry_content",
+					"typeSchema": "kyoo",
 					"primaryKey": false,
 					"notNull": true
 				},
@@ -1939,6 +1940,11 @@
 		}
 	},
 	"enums": {
+		"kyoo.entry_content": {
+			"name": "entry_content",
+			"schema": "kyoo",
+			"values": ["story", "recap", "filler", "ova"]
+		},
 		"kyoo.entry_type": {
 			"name": "entry_type",
 			"schema": "kyoo",
