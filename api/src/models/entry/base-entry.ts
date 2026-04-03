@@ -1,12 +1,7 @@
 import { t } from "elysia";
 import { Image } from "../utils/image";
 
-export const EntryContent = t.Union([
-	t.Literal("story"),
-	t.Literal("recap"),
-	t.Literal("filler"),
-	t.Literal("ova"),
-]);
+export const EntryContent = t.UnionEnum(["story", "recap", "filler", "ova"]);
 
 export const BaseEntry = () =>
 	t.Object({
