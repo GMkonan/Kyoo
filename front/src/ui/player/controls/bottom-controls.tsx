@@ -1,3 +1,4 @@
+import MenuIcon from "@material-symbols/svg-400/rounded/menu-fill.svg";
 import SkipNext from "@material-symbols/svg-400/rounded/skip_next-fill.svg";
 import SkipPrevious from "@material-symbols/svg-400/rounded/skip_previous-fill.svg";
 import { type ComponentProps, useState } from "react";
@@ -33,6 +34,7 @@ export const BottomControls = ({
 	playPrev,
 	playNext,
 	setMenu,
+	onOpenEntriesMenu,
 	className,
 	...props
 }: {
@@ -43,6 +45,7 @@ export const BottomControls = ({
 	playPrev: (() => boolean) | null;
 	playNext: (() => boolean) | null;
 	setMenu: (isOpen: boolean) => void;
+	onOpenEntriesMenu?: () => void;
 } & ViewProps) => {
 	const [seek, setSeek] = useState<number | null>(null);
 	const bottomSeek = Platform.OS !== "web" && seek !== null;
@@ -90,6 +93,7 @@ export const BottomControls = ({
 						playPrev={playPrev}
 						playNext={playNext}
 						setMenu={setMenu}
+						onOpenEntriesMenu={onOpenEntriesMenu}
 					/>
 				)}
 			</View>
@@ -102,6 +106,7 @@ const ControlButtons = ({
 	playPrev,
 	playNext,
 	setMenu,
+	onOpenEntriesMenu,
 	className,
 	...props
 }: {
@@ -109,6 +114,7 @@ const ControlButtons = ({
 	playPrev: (() => boolean) | null;
 	playNext: (() => boolean) | null;
 	setMenu: (isOpen: boolean) => void;
+	onOpenEntriesMenu?: () => void;
 	className?: string;
 }) => {
 	const { t } = useTranslation();
@@ -170,6 +176,15 @@ const ControlButtons = ({
 				/>
 			</View>
 			<View className="flex-row">
+				{onOpenEntriesMenu && (
+					<IconButton
+						icon={MenuIcon}
+						onPress={onOpenEntriesMenu}
+						className="mr-4"
+						iconClassName="fill-slate-200 dark:fill-slate-200"
+						{...tooltip(t("player.entry-list"), true)}
+					/>
+				)}
 				<SubtitleMenu player={player} {...menuProps} />
 				<AudioMenu player={player} {...menuProps} />
 				<VideoMenu player={player} {...menuProps} />

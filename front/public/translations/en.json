@@ -255,7 +255,8 @@
 		"notInPristine": "Unavailable in pristine",
 		"unsupportedError": "Video codec not supported, transcoding in progress...",
 		"not-available": "{{entry}} is not available on kyoo yet, ask your server admins about it",
-		"fatal": "Fatal playback error"
+		"fatal": "Fatal playback error",
+		"entry-list": "Entry list"
 	},
 	"search": {
 		"empty": "No result found. Try a different query."

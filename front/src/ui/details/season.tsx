@@ -158,6 +158,8 @@ export const EntryList = ({
 	season,
 	onSelectVideos,
 	search,
+	withContainer,
+	stickyHeaderConfig,
 	...props
 }: {
 	slug: string;
@@ -168,11 +170,14 @@ export const EntryList = ({
 		videos: Entry["videos"];
 	}) => void;
 	search?: string;
+	withContainer?: boolean;
 } & Partial<ComponentProps<typeof InfiniteFetch<EntryOrSeason>>>) => {
 	const { t } = useTranslation();
 	const { items: seasons, error } = useInfiniteFetch(SeasonHeader.query(slug));
 
 	if (error) console.error("Could not fetch seasons", error);
+
+	const C = withContainer ? Container : View;
 
 	return (
 		<InfiniteFetch
@@ -180,9 +185,9 @@ export const EntryList = ({
 			layout={EntryLine.layout}
 			Empty={<EmptyView message={t("show.episode-none")} />}
 			Divider={() => (
-				<Container>
+				<C>
 					<HR />
-				</Container>
+				</C>
 			)}
 			getItemType={(item, idx) =>
 				item ? item.kind : idx === 0 ? "season" : "episode"
@@ -194,7 +199,7 @@ export const EntryList = ({
 			}
 			placeholderCount={5}
 			Render={({ item }) => (
-				<Container>
+				<C>
 					{item.kind === "season" ? (
 						<SeasonHeader
 							serieSlug={slug}
@@ -205,8 +210,8 @@ export const EntryList = ({
 					) : (
 						<EntryLine
 							{...item}
-							// Don't display "Go to serie"
 							videos={item.videos}
+							// Don't display "Go to serie"
 							serieSlug={null}
 							displayNumber={entryDisplayNumber(item)}
 							watchedPercent={item.progress.percent}
@@ -219,13 +224,18 @@ export const EntryList = ({
 							}
 						/>
 					)}
-				</Container>
+				</C>
 			)}
 			Loader={({ index }) => (
-				<Container>
-					{index === 0 ? <SeasonHeader.Loader /> : <EntryLine.Loader />}
-				</Container>
+				<C>{index === 0 ? <SeasonHeader.Loader /> : <EntryLine.Loader />}</C>
 			)}
+			stickyHeaderConfig={{
+				...stickyHeaderConfig,
+				backdropComponent: () => (
+					// hr bottom margin is m-4 and layout gap is 2 but it's only applied on the web and idk why
+					<View className="absolute inset-0 mb-4 web:mb-6 bg-card" />
+				),
+			}}
 			{...props}
 		/>
 	);
