@@ -20,6 +20,7 @@ export const Controls = ({
 	chapters,
 	playPrev,
 	playNext,
+	onOpenEntriesMenu,
 	forceShow,
 }: {
 	player: VideoPlayer;
@@ -32,6 +33,7 @@ export const Controls = ({
 	chapters: Chapter[];
 	playPrev: (() => boolean) | null;
 	playNext: (() => boolean) | null;
+	onOpenEntriesMenu?: () => void;
 	forceShow?: boolean;
 }) => {
 	const isTouch = useIsTouch();
@@ -83,6 +85,7 @@ export const Controls = ({
 					chapters={chapters}
 					playPrev={playPrev}
 					playNext={playNext}
+					onOpenEntriesMenu={onOpenEntriesMenu}
 					setMenu={setMenu}
 					className="absolute bottom-0 w-full bg-slate-900/50 px-safe pt-safe"
 					{...hoverControls}

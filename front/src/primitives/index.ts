@@ -17,6 +17,7 @@ export * from "./modal";
 export * from "./popup";
 export * from "./progress";
 export * from "./select";
+export * from "./side-menu";
 export * from "./skeleton";
 export * from "./slider";
 export * from "./tabs";

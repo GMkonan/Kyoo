@@ -18,6 +18,7 @@ import { Controls, LoadingIndicator } from "./controls";
 import { ErrorPopup } from "./controls/error-popup";
 import { toggleFullscreen } from "./controls/misc";
 import { PlayModeContext } from "./controls/tracks-menu";
+import { EntriesMenu } from "./entries-menu";
 import { useKeyboard } from "./keyboard";
 import { useLanguagePreference } from "./language-preference";
 import { useProgressObserver } from "./progress-observer";
@@ -48,6 +49,7 @@ export const Player = () => {
 	const playModeState = useState(defaultPlayMode);
 	const [playMode, setPlayMode] = playModeState;
 	const [playbackError, setPlaybackError] = useState<KyooError | undefined>();
+	const [entriesMenuOpen, setEntriesMenuOpen] = useState(false);
 	const player = useVideoPlayer(
 		{
 			uri: `${apiUrl}/api/videos/${slug}/${playMode === "direct" ? "direct" : "master.m3u8"}?clientId=${clientId}`,
@@ -223,9 +225,23 @@ export const Player = () => {
 					chapters={info?.chapters ?? []}
 					playPrev={data?.previous ? playPrev : null}
 					playNext={data?.next ? playNext : null}
+					onOpenEntriesMenu={
+						data?.show?.kind === "serie"
+							? () => setEntriesMenuOpen(true)
+							: undefined
+					}
 					forceShow={!!playbackError}
 				/>
 			</PlayModeContext.Provider>
+			{data?.show?.kind === "serie" && (
+				<EntriesMenu
+					isOpen={entriesMenuOpen}
+					onClose={() => setEntriesMenuOpen(false)}
+					showSlug={data.show.slug}
+					season={entry?.kind === "episode" ? entry.seasonNumber : 0}
+					currentEntrySlug={entry?.slug}
+				/>
+			)}
 			{playbackError && (
 				<ErrorPopup
 					message={playbackError.message}
