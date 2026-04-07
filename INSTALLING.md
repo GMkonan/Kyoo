@@ -3,7 +3,7 @@
 1. Install docker & docker-compose
 2. Download the
    [`docker-compose.yml`](https://github.com/zoriya/kyoo/releases/latest/download/docker-compose.yml) and
-   [`.env`](https://github.com/zoriya/kyoo/releases/latest/download/env.example) files
+   [`.env`](https://github.com/zoriya/kyoo/releases/latest/download/.env.example) files
 3. Fill the `.env` file with your configuration options. Ensure it's named `.env` (nothing before the dot)
 4. Look at [Hardware Acceleration section](#Hardware-Acceleration) if you need it
 5. Look at [FAQ](#FAQ) if you need it,
