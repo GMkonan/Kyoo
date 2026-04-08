@@ -1,4 +1,4 @@
-import { type Falsy, Pressable, View } from "react-native";
+import { type Falsy, Pressable, ScrollView } from "react-native";
 import { cn } from "~/utils";
 import { Icon, type Icon as IconType } from "./icons";
 import { P } from "./text";
@@ -30,11 +30,14 @@ export const Tabs = <T,>({
 		icon: IconType;
 	}[];
 	return (
-		<View
+		<ScrollView
+			horizontal
+			// @ts-expect-error uniwind special props
+			containerClassName={cn("shrink flex-row items-center", className)}
 			className={cn(
-				"flex-row flex-wrap items-center overflow-hidden rounded-4xl border-3 border-accent p-1",
+				"rounded-4xl border-3 border-accent p-1",
+
 				disabled && "border-slate-600",
-				className,
 			)}
 			{...props}
 		>
@@ -70,6 +73,6 @@ export const Tabs = <T,>({
 					</P>
 				</Pressable>
 			))}
-		</View>
+		</ScrollView>
 	);
 };

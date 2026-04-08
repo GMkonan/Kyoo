@@ -151,7 +151,7 @@ const ProfileHeader = ({
 					}))}
 					value={status}
 					setValue={setStatus}
-					className="shrink self-start"
+					className="self-start"
 				/>
 			</View>
 		</View>
