@@ -84,7 +84,7 @@ export const ItemGrid = ({
 					availableCount={availableCount}
 					seenCount={seenCount}
 				/>
-				{kind === "movie" && watchPercent && (
+				{kind === "movie" && !!watchPercent && (
 					<ItemProgress watchPercent={watchPercent} />
 				)}
 				{kind !== "collection" && (

@@ -98,10 +98,7 @@ const FilterTrigger = ({
 			{...props}
 		>
 			<Icon icon={icon ?? FilterList} className="mx-1" />
-			<P>
-				{label}
-				{count > 0 ? ` (${count})` : ""}
-			</P>
+			<P>{count > 0 ? `${label} (${count})` : label}</P>
 		</PressableFeedback>
 	);
 };

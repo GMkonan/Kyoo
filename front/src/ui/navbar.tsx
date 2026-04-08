@@ -94,7 +94,6 @@ export const NavbarRight = () => {
 				key={path}
 				value={path === "/browse" ? q : undefined}
 				onChangeText={(query) => {
-					console.log(query);
 					if (path === "/browse") {
 						setQuery(query ?? undefined);
 					}
